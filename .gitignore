@@ -1,0 +1,23 @@
+# ignore data
+data/
+*.csv
+*.xlsx
+*.json
+*.parquet
+
+# ignore models
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.h5
+*.onnx
+
+# ignore logs
+*.log
+
+# ignore environments
+.venv/
+env/
+__pycache__/
+.ipynb_checkpoints/

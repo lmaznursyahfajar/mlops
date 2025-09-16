@@ -1,0 +1,13 @@
+Media type: social media
+- Model training parameters -
+Model name: main_dataset
+Model save location: models/main_dataset
+Pretrained model: indobenchmark/indobert-base-p1
+Num of training epochs: 2
+Learning rate: 6e-06
+- Dataset creation parameters -
+Input CSV file path: dataset.csv
+Training dataset save location: dataset-fix/main_dataset
+Input CSV column separators: ;
+Output CSV column separators: ;
+Dataset train fraction (for splitting): 0.8
