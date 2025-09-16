@@ -1,8 +1,7 @@
-<<<<<<< HEAD
 # db.py
 import mysql.connector
 import pandas as pd
-from config import config  # ambil object config langsung
+from config import config  # gunakan config dari file config.py
 
 def get_connection():
     try:
@@ -49,32 +48,3 @@ def get_dataframe(query, params=None):
     finally:
         if conn and conn.is_connected():
             conn.close()
-=======
-import mysql.connector
-import pandas as pd
-
-def get_connection():
-    return mysql.connector.connect(
-        host="146.190.99.120",
-        user="absa_user",
-        password="PasswordKuat123!",
-        database="absa_dummy",
-        charset="utf8mb4"
-    )
-
-def run_query(query, params=None, fetch=False):
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute(query, params or ())
-    result = cursor.fetchall() if fetch else None
-    conn.commit()
-    cursor.close()
-    conn.close()
-    return result
-
-def get_dataframe(query, params=None):
-    conn = get_connection()
-    df = pd.read_sql(query, conn, params=params)
-    conn.close()
-    return df
->>>>>>> ba0c469a (initial commit)
