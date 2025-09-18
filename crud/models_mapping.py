@@ -1,11 +1,5 @@
 import streamlit as st
-<<<<<<< HEAD
-
-from db import get_dataframe, run_query
-
-=======
 from db import run_query, get_dataframe
->>>>>>> ba0c469a (initial commit)
 
 def models_mapping_page(action):
     st.header("🔗 Models Mapping")
@@ -23,11 +17,7 @@ def models_mapping_page(action):
                     INSERT INTO models_mapping (project_id, model_name, version) 
                     VALUES (%s,%s,%s)
                     """,
-<<<<<<< HEAD
-                    (project_id, model_name, version),
-=======
                     (project_id, model_name, version)
->>>>>>> ba0c469a (initial commit)
                 )
                 st.success("✅ Mapping added")
 
@@ -47,24 +37,14 @@ def models_mapping_page(action):
                 SELECT * FROM models_mapping 
                 WHERE project_id LIKE %s OR model_name LIKE %s OR version LIKE %s
                 """,
-<<<<<<< HEAD
-                (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"),
-=======
                 (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%")
->>>>>>> ba0c469a (initial commit)
             )
 
             if df.empty:
                 st.warning("⚠️ Tidak ada mapping ditemukan.")
             else:
                 row = df.iloc[0]
-<<<<<<< HEAD
-                st.info(
-                    f"Mapping ditemukan → Project: **{row['project_id']}**, Model: **{row['model_name']}**, Version: {row['version']}"
-                )
-=======
                 st.info(f"Mapping ditemukan → Project: **{row['project_id']}**, Model: **{row['model_name']}**, Version: {row['version']}")
->>>>>>> ba0c469a (initial commit)
 
                 with st.form(f"update_{row['project_id']}_{row['model_name']}"):
                     new_proj = st.text_input("Project ID", row["project_id"])
@@ -78,17 +58,7 @@ def models_mapping_page(action):
                             SET project_id=%s, model_name=%s, version=%s 
                             WHERE project_id=%s AND model_name=%s
                             """,
-<<<<<<< HEAD
-                            (
-                                new_proj,
-                                new_name,
-                                new_ver,
-                                row["project_id"],
-                                row["model_name"],
-                            ),
-=======
                             (new_proj, new_name, new_ver, row["project_id"], row["model_name"])
->>>>>>> ba0c469a (initial commit)
                         )
                         st.success("✅ Updated")
                         st.rerun()
@@ -104,34 +74,19 @@ def models_mapping_page(action):
                 SELECT * FROM models_mapping 
                 WHERE project_id LIKE %s OR model_name LIKE %s OR version LIKE %s
                 """,
-<<<<<<< HEAD
-                (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"),
-=======
                 (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%")
->>>>>>> ba0c469a (initial commit)
             )
 
             if df.empty:
                 st.warning("⚠️ Tidak ada mapping ditemukan.")
             else:
                 row = df.iloc[0]
-<<<<<<< HEAD
-                st.error(
-                    f"Anda akan menghapus → Project: **{row['project_id']}**, Model: **{row['model_name']}**, Version: {row['version']}"
-                )
-
-                if st.button("❌ Konfirmasi Delete"):
-                    run_query(
-                        "DELETE FROM models_mapping WHERE project_id=%s AND model_name=%s",
-                        (row["project_id"], row["model_name"]),
-=======
                 st.error(f"Anda akan menghapus → Project: **{row['project_id']}**, Model: **{row['model_name']}**, Version: {row['version']}")
 
                 if st.button("❌ Konfirmasi Delete"):
                     run_query(
                         "DELETE FROM models_mapping WHERE project_id=%s AND model_name=%s", 
                         (row["project_id"], row["model_name"])
->>>>>>> ba0c469a (initial commit)
                     )
                     st.warning("❌ Deleted")
                     st.rerun()
