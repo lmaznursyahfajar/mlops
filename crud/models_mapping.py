@@ -43,8 +43,16 @@ def models_mapping_page(action):
             if df.empty:
                 st.warning("⚠️ Tidak ada mapping ditemukan.")
             else:
-                row = df.iloc[0]
-                st.info(f"Mapping ditemukan → Project: **{row['project_id']}**, Model: **{row['model_name']}**, Version: {row['version']}")
+                # biar user bisa pilih mapping kalau ada lebih dari satu
+                selected_idx = st.selectbox(
+                    "Pilih mapping yang ingin diupdate:",
+                    options=df.index,
+                    format_func=lambda i: f"Project: {df.loc[i, 'project_id']} "
+                                          f"- Model: {df.loc[i, 'model_name']} "
+                                          f"(v{df.loc[i, 'version']})"
+                )
+
+                row = df.loc[selected_idx]
 
                 with st.form(f"update_{row['project_id']}_{row['model_name']}"):
                     new_proj = st.text_input("Project ID", row["project_id"])
@@ -56,9 +64,10 @@ def models_mapping_page(action):
                             """
                             UPDATE models_mapping 
                             SET project_id=%s, model_name=%s, version=%s 
-                            WHERE project_id=%s AND model_name=%s
+                            WHERE project_id=%s AND model_name=%s AND version=%s
                             """,
-                            (new_proj, new_name, new_ver, row["project_id"], row["model_name"])
+                            (new_proj, new_name, new_ver,
+                             row["project_id"], row["model_name"], row["version"])
                         )
                         st.success("✅ Updated")
                         st.rerun()
@@ -80,13 +89,25 @@ def models_mapping_page(action):
             if df.empty:
                 st.warning("⚠️ Tidak ada mapping ditemukan.")
             else:
-                row = df.iloc[0]
+                selected_idx = st.selectbox(
+                    "Pilih mapping yang ingin dihapus:",
+                    options=df.index,
+                    format_func=lambda i: f"Project: {df.loc[i, 'project_id']} "
+                                          f"- Model: {df.loc[i, 'model_name']} "
+                                          f"(v{df.loc[i, 'version']})"
+                )
+
+                row = df.loc[selected_idx]
+
                 st.error(f"Anda akan menghapus → Project: **{row['project_id']}**, Model: **{row['model_name']}**, Version: {row['version']}")
 
                 if st.button("❌ Konfirmasi Delete"):
                     run_query(
-                        "DELETE FROM models_mapping WHERE project_id=%s AND model_name=%s", 
-                        (row["project_id"], row["model_name"])
+                        """
+                        DELETE FROM models_mapping 
+                        WHERE project_id=%s AND model_name=%s AND version=%s
+                        """,
+                        (row["project_id"], row["model_name"], row["version"])
                     )
                     st.warning("❌ Deleted")
                     st.rerun()
