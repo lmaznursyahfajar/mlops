@@ -4,6 +4,7 @@ from db import run_query, get_dataframe
 def absa_inference_models_page(action):
     st.header("🤖 ABSA Inference Models")
 
+    # CREATE
     if action == "Create":
         with st.form("add_model"):
             version = st.text_input("Version")
@@ -22,10 +23,12 @@ def absa_inference_models_page(action):
                 )
                 st.success("✅ Model added")
 
+    # READ
     elif action == "Read":
         df = get_dataframe("SELECT * FROM absa_inference_models ORDER BY created_at DESC")
         st.dataframe(df)
 
+    # UPDATE
     elif action == "Update":
         st.subheader("🔍 Cari Model untuk Update")
         keyword = st.text_input("Masukkan nama model / version")
@@ -39,8 +42,16 @@ def absa_inference_models_page(action):
             if df.empty:
                 st.warning("⚠️ Tidak ada model ditemukan.")
             else:
-                row = df.iloc[0]  # ambil hasil pertama
-                st.info(f"Model ditemukan: {row['name']} (v{row['version']})")
+                selected_uuid = st.selectbox(
+                    "Pilih model yang ingin diupdate:",
+                    options=df["uuid"],
+                    format_func=lambda u: f"{df.loc[df['uuid']==u, 'name'].values[0]} "
+                                          f"(v{df.loc[df['uuid']==u, 'version'].values[0]}) "
+                                          f"- Path: {df.loc[df['uuid']==u, 'path'].values[0]} "
+                                          f"- Created: {df.loc[df['uuid']==u, 'created_at'].values[0]}"
+                )
+
+                row = df[df["uuid"] == selected_uuid].iloc[0]
 
                 with st.form(f"update_{row['uuid']}"):
                     new_ver = st.text_input("Version", row["version"])
@@ -59,6 +70,7 @@ def absa_inference_models_page(action):
                         )
                         st.success("✅ Updated")
 
+    # DELETE
     elif action == "Delete":
         st.subheader("🔍 Cari Model untuk Delete")
         keyword = st.text_input("Masukkan nama model / version")
@@ -72,8 +84,18 @@ def absa_inference_models_page(action):
             if df.empty:
                 st.warning("⚠️ Tidak ada model ditemukan.")
             else:
-                row = df.iloc[0]
-                st.error(f"Anda akan menghapus: {row['name']} (v{row['version']})")
+                selected_uuid = st.selectbox(
+                    "Pilih model yang ingin dihapus:",
+                    options=df["uuid"],
+                    format_func=lambda u: f"{df.loc[df['uuid']==u, 'name'].values[0]} "
+                                          f"(v{df.loc[df['uuid']==u, 'version'].values[0]}) "
+                                          f"- Path: {df.loc[df['uuid']==u, 'path'].values[0]} "
+                                          f"- Created: {df.loc[df['uuid']==u, 'created_at'].values[0]}"
+                )
+
+                row = df[df["uuid"] == selected_uuid].iloc[0]
+
+                st.error(f"Anda akan menghapus: {row['name']} (v{row['version']}) - Path: {row['path']}")
 
                 if st.button("❌ Konfirmasi Delete"):
                     run_query("DELETE FROM absa_inference_models WHERE uuid=%s", (row["uuid"],))
