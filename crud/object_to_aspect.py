@@ -45,10 +45,19 @@ def object_to_aspect_page(action):
             if df.empty:
                 st.warning("⚠️ Tidak ada data ditemukan.")
             else:
-                row = df.iloc[0]
-                st.info(f"Data ditemukan → **{row['object_name']}** (Project: {row['project_id']}, Object ID: {row['object_id']})")
+                # Pilih salah satu hasil
+                selected_idx = st.selectbox(
+                    "Pilih object yang ingin diupdate:",
+                    options=df.index,
+                    format_func=lambda i: f"{df.loc[i, 'object_name']} "
+                                          f"(Project: {df.loc[i, 'project_id']}, "
+                                          f"Object ID: {df.loc[i, 'object_id']}, "
+                                          f"Aspect: {df.loc[i, 'aspect']})"
+                )
 
-                with st.form(f"update_{row['object_id']}"):
+                row = df.loc[selected_idx]
+
+                with st.form(f"update_{row['project_id']}_{row['object_id']}"):
                     new_object_name = st.text_input("Object Name", row["object_name"])
                     new_aspect = st.text_input("Aspect", row["aspect"])
                     submitted = st.form_submit_button("Update")
@@ -81,7 +90,18 @@ def object_to_aspect_page(action):
             if df.empty:
                 st.warning("⚠️ Tidak ada data ditemukan.")
             else:
-                row = df.iloc[0]
+                # Pilih salah satu hasil
+                selected_idx = st.selectbox(
+                    "Pilih object yang ingin dihapus:",
+                    options=df.index,
+                    format_func=lambda i: f"{df.loc[i, 'object_name']} "
+                                          f"(Project: {df.loc[i, 'project_id']}, "
+                                          f"Object ID: {df.loc[i, 'object_id']}, "
+                                          f"Aspect: {df.loc[i, 'aspect']})"
+                )
+
+                row = df.loc[selected_idx]
+
                 st.error(f"Anda akan menghapus → **{row['object_name']}** (Project: {row['project_id']}, Object ID: {row['object_id']})")
 
                 if st.button("❌ Konfirmasi Delete"):
