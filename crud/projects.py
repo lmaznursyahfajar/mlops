@@ -6,7 +6,7 @@ def projects_page(action):
 
     # Ambil daftar distinct project_type dari DB
     types_df = get_dataframe("SELECT DISTINCT project_type FROM projects")
-    project_types = types_df["project_type"].dropna().tolist()
+    project_types = types_df["project_type"].dropna().tolist() if not types_df.empty else []
     if not project_types:
         project_types = ["Other"]
 
@@ -19,21 +19,27 @@ def projects_page(action):
             aspect_by = st.text_input("Aspect By")
             submitted = st.form_submit_button("Add Project")
             if submitted:
-                run_query(
-                    """
-                    INSERT INTO projects 
-                    (project_name, project_name_model, project_type, aspect_by) 
-                    VALUES (%s,%s,%s,%s)
-                    """,
-                    (project_name, project_name_model, project_type, aspect_by)
-                )
-                st.success("✅ Project added")
-                st.rerun()
+                if not project_name or not project_name_model:
+                    st.error("⚠️ Project Name dan Model Name wajib diisi.")
+                else:
+                    run_query(
+                        """
+                        INSERT INTO projects 
+                        (project_name, project_name_model, project_type, aspect_by) 
+                        VALUES (%s,%s,%s,%s)
+                        """,
+                        (project_name, project_name_model, project_type, aspect_by)
+                    )
+                    st.success("✅ Project added")
+                    st.rerun()
 
     # READ
     elif action == "Read":
         df = get_dataframe("SELECT * FROM projects ORDER BY project_id DESC")
-        st.dataframe(df)
+        if df.empty:
+            st.info("ℹ️ Belum ada project.")
+        else:
+            st.dataframe(df, use_container_width=True)
 
     # UPDATE
     elif action == "Update":
@@ -63,7 +69,7 @@ def projects_page(action):
                         project_types,
                         index=project_types.index(row["project_type"]) if row["project_type"] in project_types else 0
                     )
-                    new_aspect = st.text_input("Aspect By", row["aspect_by"])
+                    new_aspect = st.text_input("Aspect By", row["aspect_by"] or "")
                     submitted = st.form_submit_button("Update")
                     if submitted:
                         run_query(
